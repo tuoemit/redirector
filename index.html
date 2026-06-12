@@ -1,53 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Redirecting...</title>
+  </head>
+  <body>
+    <p>
+      If you are not automatically redirected, follow this
+      <a href="javascript:void(0);" onclick="redirect()">link</a>.
+    </p>
+
     <script>
-        (function() {
-            // Get the 'url' parameter from query string
-            const urlParams = new URLSearchParams(window.location.search);
-            let redirectUrl = urlParams.get('url');
-            
-            // If no URL parameter, show error
-            if (!redirectUrl) {
-                document.body.innerHTML = `
-                    <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
-                        <h1>❌ Error</h1>
-                        <p>No URL provided!</p>
-                        <p>Usage: <code>?url=ANY_LINK_HERE</code></p>
-                        <p>Example: <code>?url=https://google.com</code></p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Decode if already encoded
-            try {
-                redirectUrl = decodeURIComponent(redirectUrl);
-            } catch(e) {
-                // If decode fails, use as is
-            }
-            
-            // Show status message
-            document.body.innerHTML = `
-                <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
-                    <h2>⏳ Redirecting...</h2>
-                    <p>Please wait while you are redirected to:</p>
-                    <code style="word-break: break-all; color: #0066cc;">${redirectUrl}</code>
-                    <p><small>If nothing happens, <a href="${redirectUrl}" id="manualLink">click here</a></small></p>
-                </div>
-            `;
-            
-            // Redirect after a short delay (0.1 seconds)
-            setTimeout(() => {
-                window.location.href = redirectUrl;
-            }, 100);
-            
-        })();
+      function redirect() {
+        const destination = "v3";
+        
+        // Clean the root URL by removing index.html and stripping query/hashes
+        let rootURL = window.location.href.split("?")[0].split("#")[0];
+        if (rootURL.endsWith("index.html")) {
+          rootURL = rootURL.replace("index.html", "");
+        }
+
+        // Ensure the root URL always ends with a trailing slash so /v3/ appends cleanly
+        if (!rootURL.endsWith("/")) {
+          rootURL += "/";
+        }
+
+        // Assemble the final target path
+        const finalURL = `${rootURL}${destination}/${window.location.search}`;
+
+        // Execute the redirect
+        window.location.replace(finalURL);
+      }
+
+      // Optimization: Run immediately instead of waiting for body onload images/assets to load
+      redirect();
     </script>
-</head>
-<body>
-    <p>Loading...</p>
-</body>
+  </body>
 </html>
