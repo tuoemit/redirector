@@ -3,12 +3,38 @@
   <head>
     <meta charset="UTF-8" />
     <title>Redirecting...</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f6f8fa;
+        color: #24292e;
+      }
+      .container {
+        text-align: center;
+      }
+      a {
+        color: #0366d6;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
   </head>
   <body>
-    <p>
-      If you are not automatically redirected, follow this
-      <a href="javascript:void(0);" id="fallback-link">link</a>.
-    </p>
+    <div class="container">
+      <p>Launching application configuration...</p>
+      <p>
+        If nothing happens, follow this
+        <a href="javascript:void(0);" id="fallback-link">link</a>.
+      </p>
+    </div>
 
     <script>
       function redirect() {
@@ -24,10 +50,10 @@
         if (index !== -1) {
           // Extract everything immediately following "?url="
           const rawUrl = queryString.substring(index + targetMarker.length);
-          // Decode it cleanly in case it arrives partially or fully encoded
+          // Decode it cleanly
           finalTarget = decodeURIComponent(rawUrl);
         } else {
-          // Fallback check if it was formatted with an ampersand or slightly differently
+          // Fallback check
           const urlParams = new URLSearchParams(queryString);
           finalTarget = urlParams.get('url');
         }
@@ -38,14 +64,21 @@
           return;
         }
 
-        // 4. Update the fallback link on the page just in case automation is blocked
-        document.getElementById("fallback-link").href = finalTarget;
+        // 4. Update the manual fallback link reference
+        const linkElement = document.getElementById("fallback-link");
+        linkElement.href = finalTarget;
 
-        // 5. Instantly forward the user to the application link scheme
+        // 5. Try an instant redirect right away
         window.location.replace(finalTarget);
+
+        // 6. Added Function: Wait 1 second (1000ms), then try forcing the redirect again
+        setTimeout(function() {
+          console.log("Executing secondary automatic redirect fallback...");
+          window.location.href = finalTarget;
+        }, 1000);
       }
 
-      // Execute the logic right away
+      // Execute the logic right away when the DOM loads
       redirect();
     </script>
   </body>
