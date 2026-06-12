@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+    <script>
+        (function() {
+            // Get the 'url' parameter from query string
+            const urlParams = new URLSearchParams(window.location.search);
+            let redirectUrl = urlParams.get('url');
+            
+            // If no URL parameter, show error
+            if (!redirectUrl) {
+                document.body.innerHTML = `
+                    <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+                        <h1>❌ Error</h1>
+                        <p>No URL provided!</p>
+                        <p>Usage: <code>?url=ANY_LINK_HERE</code></p>
+                        <p>Example: <code>?url=https://google.com</code></p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Decode if already encoded
+            try {
+                redirectUrl = decodeURIComponent(redirectUrl);
+            } catch(e) {
+                // If decode fails, use as is
+            }
+            
+            // Show status message
+            document.body.innerHTML = `
+                <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+                    <h2>⏳ Redirecting...</h2>
+                    <p>Please wait while you are redirected to:</p>
+                    <code style="word-break: break-all; color: #0066cc;">${redirectUrl}</code>
+                    <p><small>If nothing happens, <a href="${redirectUrl}" id="manualLink">click here</a></small></p>
+                </div>
+            `;
+            
+            // Redirect after a short delay (0.1 seconds)
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 100);
+            
+        })();
+    </script>
+</head>
+<body>
+    <p>Loading...</p>
+</body>
+</html>
