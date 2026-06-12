@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+</head>
+<body>
+<script>
+  const params = new URLSearchParams(window.location.search);
+
+  const url = params.get("url");
+  const name = params.get("name");
+
+  if (url) {
+    // optional: small delay or logging
+    window.location.href = url;
+  } else {
+    document.body.innerText = "Missing URL parameter";
+  }
+</script>
+</body>
+</html>
