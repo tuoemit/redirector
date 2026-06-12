@@ -7,32 +7,45 @@
   <body>
     <p>
       If you are not automatically redirected, follow this
-      <a href="javascript:void(0);" onclick="redirect()">link</a>.
+      <a href="javascript:void(0);" id="fallback-link">link</a>.
     </p>
 
     <script>
       function redirect() {
-        const destination = "v3";
+        // 1. Get the current query string
+        const queryString = window.location.search;
         
-        // Clean the root URL by removing index.html and stripping query/hashes
-        let rootURL = window.location.href.split("?")[0].split("#")[0];
-        if (rootURL.endsWith("index.html")) {
-          rootURL = rootURL.replace("index.html", "");
+        // 2. Find where the target url parameter begins
+        const targetMarker = "?url=";
+        const index = queryString.indexOf(targetMarker);
+        
+        let finalTarget = "";
+
+        if (index !== -1) {
+          // Extract everything immediately following "?url="
+          const rawUrl = queryString.substring(index + targetMarker.length);
+          // Decode it cleanly in case it arrives partially or fully encoded
+          finalTarget = decodeURIComponent(rawUrl);
+        } else {
+          // Fallback check if it was formatted with an ampersand or slightly differently
+          const urlParams = new URLSearchParams(queryString);
+          finalTarget = urlParams.get('url');
         }
 
-        // Ensure the root URL always ends with a trailing slash so /v3/ appends cleanly
-        if (!rootURL.endsWith("/")) {
-          rootURL += "/";
+        // 3. Error handle if no destination was found
+        if (!finalTarget) {
+          document.body.innerHTML = "<h2>Error: No valid configuration URL found.</h2>";
+          return;
         }
 
-        // Assemble the final target path
-        const finalURL = `${rootURL}${destination}/${window.location.search}`;
+        // 4. Update the fallback link on the page just in case automation is blocked
+        document.getElementById("fallback-link").href = finalTarget;
 
-        // Execute the redirect
-        window.location.replace(finalURL);
+        // 5. Instantly forward the user to the application link scheme
+        window.location.replace(finalTarget);
       }
 
-      // Optimization: Run immediately instead of waiting for body onload images/assets to load
+      // Execute the logic right away
       redirect();
     </script>
   </body>
