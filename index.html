@@ -1,40 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
+
     <style>
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        background-color: #f6f8fa;
-        color: #24292e;
-      }
-      .container {
-        text-align: center;
-      }
-      a {
-        color: #0366d6;
-        text-decoration: none;
-        font-weight: bold;
-      }
-      a:hover {
-        text-decoration: underline;
-      }
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f6f8fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #24292e;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            max-width: 500px;
+        }
+
+        a, button {
+            margin-top: 10px;
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        a {
+            color: #0366d6;
+        }
+
+        button {
+            background: #0366d6;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
     </style>
-  </head>
-  <body>
-    <div class="container">
-      <p>Launching application configuration...</p>
-      <p>
-        If nothing happens, follow this
-        <a href="javascript:void(0);" id="fallback-link">link</a>.
-      </p>
-    </div>
+</head>
+<body>
+
+<div class="container">
+    <h2>Launching...</h2>
+    <p>Attempting to open the target application.</p>
+
+    <p>
+        If nothing happens,
+        <a id="fallback-link" href="#">click here</a>.
+    </p>
+
+    <button id="open-btn">Open Manually</button>
+</div>
+
+<script>
+(function() {
+
+    function getTargetUrl() {
+        const query = window.location.search;
+
+        const match = query.match(/[?&]url=(.*)$/);
+
+        if (!match) {
+            return null;
+        }
+
+        try {
+            return decodeURIComponent(match[1]);
+        } catch {
+            return match[1];
+        }
+    }
+
+    const target = getTargetUrl();
+
+    if (!target) {
+        document.body.innerHTML =
+            "<div class='container'><h2>Error</h2><p>No URL provided.</p></div>";
+        return;
+    }
+
+    document.getElementById("fallback-link").href = target;
+
+    function launch() {
+
+        try {
+            window.location.href = target;
+        } catch (e) {}
+
+        setTimeout(() => {
+            try {
+                window.location.replace(target);
+            } catch (e) {}
+        }, 300);
+
+        setTimeout(() => {
+            try {
+                const iframe = document.createElement("iframe");
+                iframe.style.display = "none";
+                iframe.src = target;
+                document.body.appendChild(iframe);
+            } catch (e) {}
+        }, 600);
+    }
+
+    document.getElementById("open-btn")
+        .addEventListener("click", launch);
+
+    document.getElementById("fallback-link")
+        .addEventListener("click", function(e) {
+            e.preventDefault();
+            launch();
+        });
+
+    launch();
+
+})();
+</script>
+
+</body>
+</html>    </div>
 
     <script>
       function redirect() {
