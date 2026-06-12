@@ -1,126 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Launching...</title>
 
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #f6f8fa;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            color: #24292e;
-        }
-
-        .container {
-            text-align: center;
-            padding: 20px;
-            max-width: 500px;
-        }
-
-        a, button {
-            margin-top: 10px;
-            display: inline-block;
-            padding: 10px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        a {
-            color: #0366d6;
-        }
-
-        button {
-            background: #0366d6;
-            color: white;
-        }
-
-        button:hover {
-            opacity: 0.9;
-        }
-    </style>
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:grid;
+    place-items:center;
+    font-family:system-ui,-apple-system,sans-serif;
+    background:#f6f8fa;
+    color:#24292e;
+}
+.box{
+    text-align:center;
+    padding:20px;
+}
+a,button{
+    display:inline-block;
+    margin-top:10px;
+    padding:10px 16px;
+    border-radius:8px;
+    border:0;
+    cursor:pointer;
+    text-decoration:none;
+    font-size:14px;
+}
+a{color:#0366d6}
+button{
+    background:#0366d6;
+    color:#fff;
+}
+</style>
 </head>
 <body>
 
-<div class="container">
+<div class="box">
     <h2>Launching...</h2>
     <p>Attempting to open the target application.</p>
 
     <p>
         If nothing happens,
-        <a id="fallback-link" href="#">click here</a>.
+        <a id="fallback" href="#">click here</a>.
     </p>
 
-    <button id="open-btn">Open Manually</button>
+    <button id="open">Open Manually</button>
 </div>
 
 <script>
-(function() {
+(() => {
 
-    function getTargetUrl() {
-        const query = window.location.search;
-
-        const match = query.match(/[?&]url=(.*)$/);
-
-        if (!match) {
-            return null;
-        }
-
-        try {
-            return decodeURIComponent(match[1]);
-        } catch {
-            return match[1];
-        }
-    }
-
-    const target = getTargetUrl();
+    const target = new URLSearchParams(location.search).get("url");
 
     if (!target) {
         document.body.innerHTML =
-            "<div class='container'><h2>Error</h2><p>No URL provided.</p></div>";
+            "<h2>Error</h2><p>No URL provided.</p>";
         return;
     }
 
-    document.getElementById("fallback-link").href = target;
+    const url = decodeURIComponent(target);
+
+    const fallback = document.getElementById("fallback");
+    const openBtn = document.getElementById("open");
+
+    fallback.href = url;
 
     function launch() {
 
-        try {
-            window.location.href = target;
-        } catch (e) {}
+        // Method 1
+        location.href = url;
 
-        setTimeout(() => {
-            try {
-                window.location.replace(target);
-            } catch (e) {}
-        }, 300);
+        // Method 2
+        setTimeout(() => location.replace(url), 100);
 
+        // Method 3
         setTimeout(() => {
-            try {
-                const iframe = document.createElement("iframe");
-                iframe.style.display = "none";
-                iframe.src = target;
-                document.body.appendChild(iframe);
-            } catch (e) {}
-        }, 600);
+            const iframe = document.createElement("iframe");
+            iframe.style.display = "none";
+            iframe.src = url;
+            document.body.appendChild(iframe);
+        }, 200);
+
+        // Method 4
+        setTimeout(() => window.open(url, "_self"), 300);
     }
 
-    document.getElementById("open-btn")
-        .addEventListener("click", launch);
+    fallback.onclick = e => {
+        e.preventDefault();
+        launch();
+    };
 
-    document.getElementById("fallback-link")
-        .addEventListener("click", function(e) {
-            e.preventDefault();
-            launch();
-        });
+    openBtn.onclick = launch;
 
     launch();
 
@@ -128,52 +101,4 @@
 </script>
 
 </body>
-</html>    </div>
-
-    <script>
-      function redirect() {
-        // 1. Get the current query string
-        const queryString = window.location.search;
-        
-        // 2. Find where the target url parameter begins
-        const targetMarker = "?url=";
-        const index = queryString.indexOf(targetMarker);
-        
-        let finalTarget = "";
-
-        if (index !== -1) {
-          // Extract everything immediately following "?url="
-          const rawUrl = queryString.substring(index + targetMarker.length);
-          // Decode it cleanly
-          finalTarget = decodeURIComponent(rawUrl);
-        } else {
-          // Fallback check
-          const urlParams = new URLSearchParams(queryString);
-          finalTarget = urlParams.get('url');
-        }
-
-        // 3. Error handle if no destination was found
-        if (!finalTarget) {
-          document.body.innerHTML = "<h2>Error: No valid configuration URL found.</h2>";
-          return;
-        }
-
-        // 4. Update the manual fallback link reference
-        const linkElement = document.getElementById("fallback-link");
-        linkElement.href = finalTarget;
-
-        // 5. Try an instant redirect right away
-        window.location.replace(finalTarget);
-
-        // 6. Added Function: Wait 1 second (1000ms), then try forcing the redirect again
-        setTimeout(function() {
-          console.log("Executing secondary automatic redirect fallback...");
-          window.location.href = finalTarget;
-        }, 1000);
-      }
-
-      // Execute the logic right away when the DOM loads
-      redirect();
-    </script>
-  </body>
 </html>
